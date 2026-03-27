@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect - Modern Chat App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          animation: {
+            'slide-in': 'slideIn 0.3s ease-out',
+            'fade-in': 'fadeIn 0.2s ease-out',
+            'typing': 'typing 1.5s infinite',
+            'bounce-slow': 'bounce 2s infinite',
+          },
+          keyframes: {
+            slideIn: {
+              '0%': { transform: 'translateX(20px)', opacity: 0 },
+              '100%': { transform: 'translateX(0)', opacity: 1 }
+            },
+            fadeIn: {
+              '0%': { opacity: 0 },
+              '100%': { opacity: 1 }
+            },
+            typing: {
+              '0%, 60%, 100%': { transform: 'translateY(0)', backgroundColor: 'rgb(239 246 255)' },
+              '30%': { transform: 'translateY(-10px)', backgroundColor: 'rgb(219 234 254)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .chat-bubble {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    }
+    .chat-bubble-received {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    }
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .sidebar-item-hover {
+      background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), transparent);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen font-sans antialiased">
+  <div id="landingPage" class="fixed inset-0 flex flex-col items-center justify-center text-center px-6 bg-black text-white z-50">
+
+  <span class="bg-purple-600/20 text-purple-400 px-4 py-1 rounded-full text-sm mb-4">
+    Reach people like you
+  </span>
+
+  <h1 class="text-4xl md:text-5xl font-bold mb-4">
+    Anonymous Chat, Meet CUcians 🔥
+  </h1>
+
+  <p class="text-gray-400 max-w-2xl mb-8">
+    Find strangers worldwide and connect instantly.
+  </p>
+
+ <button onclick="showLogin()"
+class="bg-purple-600 hover:bg-purple-700 px-8 py-3 rounded-full text-lg cursor-pointer">
+💬 Start Chat
+</button>
+</div>
+  <!-- LOGIN PAGE -->
+<div id="loginPage" class="hidden fixed inset-0 flex items-center justify-center bg-black text-white z-50">
+
+  <div class="bg-white/10 backdrop-blur-xl p-8 rounded-3xl w-[350px] text-center shadow-xl">
+
+    <h2 class="text-2xl font-bold mb-4">Welcome CUcians 🔥</h2>
+
+    <input id="emailInput" type="email" placeholder="Enter email"
+class="w-full p-3 mb-4 rounded-lg text-black outline-none">
+
+<input id="passwordInput" type="password" placeholder="Enter password"
+class="w-full p-3 mb-4 rounded-lg text-black outline-none">
+
+<button onclick="signUp()"
+class="w-full bg-green-600 py-2 rounded-lg mb-2">
+Sign Up
+</button>
+
+<button onclick="login()"
+class="w-full bg-purple-600 py-2 rounded-lg">
+Login
+</button>
+
+</div>
+</div>
+  <div id="profilePage" class="hidden fixed inset-0 flex items-center justify-center bg-black text-white z-50">
+
+  <div class="bg-white/10 p-8 rounded-3xl w-[350px] text-center">
+
+    <h2 class="text-2xl mb-4">Complete Profile 👤</h2>
+
+    <input id="usernameInput" type="text" placeholder="Enter username"
+    class="w-full p-3 mb-4 rounded-lg text-black">
+
+    <select id="genderInput"
+    class="w-full p-3 mb-4 rounded-lg text-black">
+      <option value="">Select Gender</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+
+    <button onclick="saveProfile()"
+    class="w-full bg-green-600 py-2 rounded-lg">
+      Continue
+    </button>
+
+  </div>
+  </div>
+
+  <div id="app" class="hidden flex h-screen w-full shadow-2xl rounded-3xl overflow-hidden bg-white/80 backdrop-blur-xl">
+
+    <!-- Left Sidebar - Chat List -->
+    <div class="w-80 bg-white/70 backdrop-blur-xl border-r border-gray-100 flex flex-col shadow-xl">
+      <!-- Top Bar -->
+      <div class="p-6 border-b border-gray-100">
+        <div class="flex items-center space-x-4">
+          <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <i class="fas fa-comments text-white text-xl"></i>
+          </div>
+          <div>
+            <h1 class="font-bold text-xl text-gray-900">Connect</h1>
+            <p class="text-sm text-gray-500">Your conversations</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="p-4">
+        <div class="relative">
+          <i class="fas fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+          <input 
+            type="text" 
+            placeholder="Search conversations..." 
+            class="w-full pl-12 pr-4 py-3 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
+          >
+        </div>
+      </div>
+
+      <!-- Chat List -->
+      <div class="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        <div class="space-y-1 p-2">
+          <!-- Active Chat -->
+          <div class="sidebar-item group cursor-pointer p-4 rounded-2xl hover:sidebar-item-hover transition-all duration-200 active-chat">
+            <div class="flex items-center space-x-4">
+              <div class="relative">
+                <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face" alt="Sarah" class="w-14 h-14 rounded-2xl shadow-lg ring-2 ring-green-400 ring-opacity-50">
+                <div class="w-3 h-3 bg-green-400 border-2 border-white rounded-full absolute -bottom-1 -right-1 shadow-md"></div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <h3 class="font-semibold text-gray-900 group-hover:text-blue-600 truncate">Sarah Johnson</h3>
+                  <span class="text-xs text-green-500 font-medium">Online</span>
+                </div>
+                <p class="text-sm text-gray-500 truncate mt-0.5">Hey! Are you free this weekend? 🎉</p>
+              </div>
+              <div class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity">3</div>
+            </div>
+          </div>  <!-- Chat List END -->
+
+<!-- 🔥 PASTE PROFILE HERE -->
+<div class="mt-auto border-t pt-4">
+
+  <div class="flex items-center gap-3 mb-3">
+    <img src="https://i.pravatar.cc/40" class="rounded-full">
+    <div>
+      <p class="font-semibold">Your Name</p>
+      <span class="text-sm text-gray-500">Online</span>
+    </div>
+  </div>
+
+  <div class="space-y-2 text-sm">
+    <button class="w-full text-left hover:text-blue-500">⚙ Settings</button>
+    <button class="w-full text-left hover:text-blue-500">🆘 Help</button>
+    <button class="w-full text-left hover:text-blue-500">✏ Change Username</button>
+    <button class="w-full text-left hover:text-blue-500">🖼 Change Avatar</button>
+    <button class="w-full text-left hover:text-blue-500">🔒 Change Password</button>
+    <button class="w-full text-left text-red-500">🚪 Sign Out</button>
+  </div>
+
+</div>
+          
+
+          <!-- Other Chats -->
+          <div class="sidebar-item group cursor-pointer p-4 rounded-2xl hover:sidebar-item-hover transition-all duration-200">
+            <div class="flex items-center space-x-4">
+              <div class="relative">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face" alt="Mike" class="w-14 h-14 rounded-2xl shadow-lg ring-2 ring-gray-200">
+                <div class="w-3 h-3 bg-gray-400 border-2 border-white rounded-full absolute -bottom-1 -right-1 shadow-md"></div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <h3 class="font-semibold text-gray-900 group-hover:text-blue-600 truncate">Mike Chen</h3>
+                  <span class="text-xs text-gray-500">2m ago</span>
+                </div>
+                <p class="text-sm text-gray-500 truncate mt-0.5">Thanks for the recommendation!</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-item group cursor-pointer p-4 rounded-2xl hover:sidebar-item-hover transition-all duration-200">
+            <div class="flex items-center space-x-4">
+              <div class="relative">
+                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face" alt="Emma" class="w-14 h-14 rounded-2xl shadow-lg ring-2 ring-gray-200">
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <h3 class="font-semibold text-gray-900 group-hover:text-blue-600 truncate">Emma Davis</h3>
+                  <span class="text-xs text-gray-500">1h ago</span>
+                </div>
+                <p class="text-sm text-gray-500 truncate mt-0.5">See you tomorrow! 👋</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Chat Panel -->
+    <div class="flex-1 flex flex-col bg-gradient-to-b from-white via-slate-50 to-blue-50">
+      <!-- Chat Header -->
+      <div class="p-6 border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+        <div class="flex items-center space-x-4">
+          <div class="relative">
+            <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face" alt="Sarah" class="w-16 h-16 rounded-2xl shadow-xl ring-3 ring-green-400 ring-opacity-30">
+            <div class="w-4 h-4 bg-green-400 border-3 border-white rounded-full absolute -bottom-1 -right-1 shadow-lg"></div>
+          </div>
+          <div>
+            <h2 class="font-bold text-2xl text-gray-900">Sarah Johnson</h2>
+            <p class="text-sm text-green-600 font-medium flex items-center">
+              <span class="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></span>
+              Online
+            </p>
+          </div>
+          <div class="ml-auto flex items-center space-x-2">
+            <button class="p-2 hover:bg-gray-100 rounded-xl transition-all duration-200">
+              <i class="fas fa-phone text-xl text-gray-600"></i>
+            </button>
+            <button class="p-2 hover:bg-gray-100 rounded-xl transition-all duration-200">
+              <i class="fas fa-video text-xl text-gray-600"></i>
+            </button>
+            <button class="p-2 hover:bg-gray-100 rounded-xl transition-all duration-200">
+              <i class="fas fa-ellipsis-v text-xl text-gray-600"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages Area -->
+      <div id="messagesContainer" class="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 p-6 space-y-4">
+        <!-- Messages will appear here -->
+      </div>
+
+      <!-- Typing Indicator -->
+      <div id="typingIndicator" class="hidden px-6 py-3 flex items-center space-x-2">
+        <div class="w-3 h-3 bg-gray-400 rounded-full animate-bounce"></div>
+        <div class="w-3 h-3 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
+        <div class="w-3 h-3 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s;"></div>
+        <span class="text-sm text-gray-500 ml-2">typing...</span>
+      </div>
+
+      <div id="emptyState" class="hidden flex-1 flex items-center justify-center text-center">
+
+  <div onclick="startChat()" class="cursor-pointer p-10 rounded-2xl hover:scale-105 transition">
+
+    <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text mb-2">
+      Click here to start chat 💬
+    </h1>
+
+    <p class="text-gray-500">
+      Select a friend from sidebar
+    </p>
+
+  </div>
+
+</div>
+
+      <!-- Input Area -->
+      <div class="p-6 pt-0 bg-white/70 backdrop-blur-sm border-t border-gray-100">
+        <div class="max-w-4xl mx-auto">
+          <div class="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-3xl p-4 shadow-xl hover:shadow-2xl transition-all duration-300 focus-within:shadow-2xl focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-500/50">
+            <div class="flex items-end space-x-4">
+              <button class="p-3 text-gray-500 hover:text-blue-500 hover:bg-blue-50 rounded-2xl transition-all duration-200 group">
+                <i class="fas fa-image text-xl group-hover:scale-110 transition-transform"></i>
+              </button>
+              <div class="flex-1 relative">
+                <input 
+                  id="messageInput"
+                  type="text" 
+                  placeholder="Type a message..." 
+                  class="w-full bg-transparent outline-none text-gray-900 placeholder-gray-500 text-lg pr-12 py-4 resize-none"
+                >
+                <button id="sendButton" class="absolute right-1 bottom-3 p-2 text-blue-500 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all duration-200 opacity-70 hover:opacity-100">
+                  <i class="fas fa-paper-plane text-xl rotate-0 send-icon transition-all duration-200"></i>
+                </button>
+              </div>
+              <button class="p-3 text-gray-500 hover:text-blue-500 hover:bg-blue-50 rounded-2xl transition-all duration-200">
+                <i class="fas fa-smile text-xl"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sample messages
+    const sampleMessages = [
+      { type: 'received', text: "Hey! How's your day going? 😊", time: '10:30 AM' },
+      { type: 'sent', text: "Pretty good! Just finished a meeting. What's up with you?", time: '10:32 AM' },
+      { type: 'received', text: "Same here! Working on that project we talked about. You free this weekend?", time: '10:33 AM' },
+      { type: 'sent', text: "Yeah definitely! What did you have in mind?", time: '10:35 AM' },
+      { type: 'received', text: "Maybe grab coffee and catch up? It's been forever! 🎉", time: '10:36 AM' },
+    ];
+
+    // Initialize messages
+    function initMessages() {
+      const container = document.getElementById('messagesContainer');
+      sampleMessages.forEach((msg, index) => {
+        setTimeout(() => {
+          appendMessage(msg);
+        }, index * 300);
+      });
+    }
+
+    // Append message with animation
+    function appendMessage(message) {
+      const container = document.getElementById('messagesContainer');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `flex ${message.type === 'sent' ? 'justify-end' : 'justify-start'} animate-slide-in`;
+      
+      messageDiv.innerHTML = `
+        <div class="max-w-xs lg:max-w-md px-4 py-3 rounded-3xl shadow-lg ${message.type === 'sent' ? 'chat-bubble text-white' : 'chat-bubble-received shadow-md'}">
+          <p class="text-sm leading-relaxed">${message.text}</p>
+          <div class="flex items-center justify-end mt-2 pt-2 border-t border-opacity-20 border-white/20">
+            <span class="text-xs opacity-75">${message.time}</span>
+            ${message.type === 'sent' ? '<i class="fas fa-check-double ml-1 text-blue-200 text-xs"></i>' : ''}
+          </div>
+        </div>
+      `;
+      
+      container.appendChild(messageDiv);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Send message handler
+    document.getElementById('sendButton').addEventListener('click', sendMessage);
+    document.getElementById('messageInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const text = input.value.trim();
+      
+      if (text) {
+        const message = {
+          type: 'sent',
+          text: text,
+          time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        };
+        
+        appendMessage(message);
+        input.value = '';
+        
+        // Simulate typing indicator and response
+        showTypingIndicator();
+        setTimeout(() => {
+          hideTypingIndicator();
+          appendMessage({
+            type: 'received',
+            text: "Awesome! Looking forward to it! ☕",
+            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+          });
+        }, 1500 + Math.random() * 1000);
+      }
+    }
+
+    // Typing indicator
+    function showTypingIndicator() {
+      document.getElementById('typingIndicator').classList.remove('hidden');
+    }
+
+    function hideTypingIndicator() {
+      document.getElementById('typingIndicator').classList.add('hidden');
+    }
+
+    // Send button animation
+    const sendButton = document.getElementById('sendButton');
+    const sendIcon = document.querySelector('.send-icon');
+    const input = document.getElementById('messageInput');
+
+    input.addEventListener('input', function() {
+      if (this.value.trim()) {
+        sendButton.classList.remove('opacity-70');
+        sendIcon.classList.add('rotate-[-20deg]');
+      } else {
+        sendButton.classList.add('opacity-70');
+        sendIcon.classList.remove('rotate-[-20deg]');
+      }
+    });
+
+    // Sidebar chat selection
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelector('.active-chat')?.classList.remove('active-chat');
+        this.classList.add('active-chat');
+        
+        // Add subtle active state
+        this.style.background = 'linear-gradient(90deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.05))';
+      });
+    });
+
+    // Responsive sidebar collapse on mobile
+    function handleResize() {
+      if (window.innerWidth < 1024) {
+        // Mobile behavior
+      }
+    }
+
+    window.addEventListener('resize', handleResize);
+    </script>
+
+<script type="module">
+
+// 🔥 Firebase imports
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+
+import { getFirestore, doc, setDoc, getDoc } 
+from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+
+
+// 🔥 Config
+const firebaseConfig = {
+  apiKey: "AIzaSyB6aCidE3CK5pljGNTypQYO3mZ9z83OCt4",
+  authDomain: "cuconnect-37a46.firebaseapp.com",
+  projectId: "cuconnect-37a46",
+  storageBucket: "cuconnect-37a46.firebasestorage.app",
+  messagingSenderId: "299927809583",
+  appId: "1:299927809583:web:e011030850de649519e0da",
+  measurementId: "G-VKR387D6Y3"
+};
+
+// 🔥 Init
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+
+const db = getFirestore(app);
+
+
+// ================== FUNCTIONS ==================
+
+window.showLogin = function () {
+  document.getElementById("landingPage").style.display = "none";
+  document.getElementById("loginPage").classList.remove("hidden");
+};
+
+let confirmationResult;
+
+// SIGN UP
+window.signUp = function () {
+  const email = document.getElementById("emailInput").value;
+  const password = document.getElementById("passwordInput").value;
+
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(() => {
+      alert("Account Created 🎉");
+    })
+    .catch((error) => {
+      alert(error.message);
+    });
+};
+
+// LOGIN
+window.login = async function () {
+  const email = document.getElementById("emailInput").value;
+  const password = document.getElementById("passwordInput").value;
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then(async (userCredential) => {
+
+      const user = userCredential.user;
+
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        // profile hai
+        document.getElementById("loginPage").classList.add("hidden");
+        document.getElementById("app").classList.remove("hidden");
+      } else {
+        // profile nahi hai
+        document.getElementById("loginPage").classList.add("hidden");
+        document.getElementById("profilePage").classList.remove("hidden");
+      }
+
+    })
+    .catch((error) => {
+      alert(error.message);
+    });
+};
+  window.saveProfile = async function () {
+  const username = document.getElementById("usernameInput").value;
+  const gender = document.getElementById("genderInput").value;
+
+  const user = auth.currentUser;
+
+  if (!username || !gender) {
+    alert("Fill all fields ❌");
+    return;
+  }
+
+  await setDoc(doc(db, "users", user.uid), {
+    username: username,
+    gender: gender,
+    email: user.email
+  });
+
+  alert("Profile Saved 🎉");
+
+  document.getElementById("profilePage").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  
+  // Initialize messages when app loads
+  setTimeout(initMessages, 500);
+};
+
+window.startChat = function () {
+  document.getElementById("emptyState").classList.add("hidden");
+  document.getElementById("messagesContainer").classList.remove("hidden");
+  initMessages();
+};
+
+</script>
+</body>
+</html>
+
+
