@@ -259,7 +259,7 @@ Login
       </div>
 
       <!-- Messages Area -->
-      <div id="messagesContainer" class="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 p-6 space-y-4">
+      <div id="messagesContainer" class="hidden flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 p-6 space-y-4">
         <!-- Messages will appear here -->
       </div>
 
@@ -271,7 +271,7 @@ Login
         <span class="text-sm text-gray-500 ml-2">typing...</span>
       </div>
 
-      <div id="emptyState" class="hidden flex-1 flex items-center justify-center text-center">
+      <div id="emptyState" class="flex-1 flex items-center justify-center text-center">
 
   <div onclick="startChat()" class="cursor-pointer p-10 rounded-2xl hover:scale-105 transition">
 
@@ -509,6 +509,9 @@ window.login = async function () {
         // profile hai
         document.getElementById("loginPage").classList.add("hidden");
         document.getElementById("app").classList.remove("hidden");
+
+        // show chat immediately and eliminate perceived dashboard lag
+        startChat();
       } else {
         // profile nahi hai
         document.getElementById("loginPage").classList.add("hidden");
@@ -541,9 +544,9 @@ window.login = async function () {
 
   document.getElementById("profilePage").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
-  
-  // Initialize messages when app loads
-  setTimeout(initMessages, 500);
+
+  // show chat right away, no extra delay
+  startChat();
 };
 
 window.startChat = function () {
