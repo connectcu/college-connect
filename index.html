@@ -517,7 +517,7 @@ window.login = async function () {
         document.getElementById("app").classList.remove("hidden");
 
         // show chat immediately and eliminate perceived dashboard lag
-        startChat();
+        window.startChat();
       } else {
         // profile nahi hai
         document.getElementById("loginPage").classList.add("hidden");
@@ -552,7 +552,7 @@ window.login = async function () {
   document.getElementById("app").classList.remove("hidden");
 
   // show chat right away, no extra delay
-  startChat();
+  window.startChat();
 };
 
 </script>
