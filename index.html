@@ -435,6 +435,12 @@ Login
     }
 
     window.addEventListener('resize', handleResize);
+
+    window.startChat = function () {
+      document.getElementById("emptyState").classList.add("hidden");
+      document.getElementById("messagesContainer").classList.remove("hidden");
+      initMessages();
+    };
     </script>
 
 <script type="module">
@@ -547,12 +553,6 @@ window.login = async function () {
 
   // show chat right away, no extra delay
   startChat();
-};
-
-window.startChat = function () {
-  document.getElementById("emptyState").classList.add("hidden");
-  document.getElementById("messagesContainer").classList.remove("hidden");
-  initMessages();
 };
 
 </script>
