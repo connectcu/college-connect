@@ -484,21 +484,77 @@ window.showLogin = function () {
 };
 
 window.signUp = function () {
-  alert("Sign up functionality requires Firebase. Please check your connection.");
+  const email = document.getElementById('emailInput').value.trim();
+  const password = document.getElementById('passwordInput').value.trim();
+
+  if (!email || !password) {
+    alert('Please enter both email and password');
+    return;
+  }
+
+  if (password.length < 6) {
+    alert('Password must be at least 6 characters');
+    return;
+  }
+
+  createUserWithEmailAndPassword(window.auth, email, password)
+    .then((userCredential) => {
+      console.log('Account created:', userCredential.user);
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('profilePage').classList.remove('hidden');
+    })
+    .catch((error) => {
+      console.error('Sign up error:', error.message);
+      alert('Sign up failed: ' + error.message);
+    });
 };
 
 window.login = function () {
-  console.log("Login function called");
-  if (typeof signInWithEmailAndPassword === 'undefined') {
-    alert("Firebase not loaded. Please check your internet connection and refresh the page.");
+  const email = document.getElementById('emailInput').value.trim();
+  const password = document.getElementById('passwordInput').value.trim();
+
+  if (!email || !password) {
+    alert('Please enter both email and password');
     return;
   }
-  // If Firebase is loaded, the module will have redefined this function
-  alert("Firebase loaded, but function not redefined. Please refresh.");
+
+  signInWithEmailAndPassword(window.auth, email, password)
+    .then((userCredential) => {
+      console.log('Login successful:', userCredential.user);
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('profilePage').classList.remove('hidden');
+    })
+    .catch((error) => {
+      console.error('Login error:', error.message);
+      alert('Login failed: ' + error.message);
+    });
 };
 
 window.saveProfile = function () {
-  alert("Save profile functionality requires Firebase. Please check your connection.");
+  const username = document.getElementById('usernameInput').value.trim();
+  const gender = document.getElementById('genderInput').value;
+  const userId = window.auth.currentUser.uid;
+
+  if (!username || !gender) {
+    alert('Please fill in all profile fields');
+    return;
+  }
+
+  setDoc(doc(window.db, 'users', userId), {
+    username: username,
+    gender: gender,
+    email: window.auth.currentUser.email,
+    createdAt: new Date()
+  })
+    .then(() => {
+      console.log('Profile saved');
+      document.getElementById('profilePage').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
+    })
+    .catch((error) => {
+      console.error('Error saving profile:', error.message);
+      alert('Error saving profile: ' + error.message);
+    });
 };
     </script>
 
