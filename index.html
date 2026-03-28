@@ -497,9 +497,41 @@ window.signUp = function () {
     return;
   }
 
-  createUserWithEmailAndPassword(window.auth, email, password)
-    .then((userCredential) => {
-      console.log('Account created:', userCredential.user);
+  window.saveProfile = function () {
+  const username = document.getElementById('usernameInput').value.trim();
+  const gender = document.getElementById('genderInput').value;
+
+  if (!username || !gender) {
+    alert('Please fill in all profile fields');
+    return;
+  }
+
+  // Check if user is authenticated
+  if (!window.auth.currentUser) {
+    alert('User not authenticated. Please login first.');
+    return;
+  }
+
+  const userId = window.auth.currentUser.uid;
+
+  // Save to Firestore
+  window.setDoc(window.doc(window.db, 'users', userId), {
+    username: username,
+    gender: gender,
+    email: window.auth.currentUser.email,
+    createdAt: new Date()
+  })
+    .then(() => {
+      console.log('Profile saved successfully');
+      // Hide profile page and show dashboard
+      document.getElementById('profilePage').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
+    })
+    .catch((error) => {
+      console.error('Error saving profile:', error);
+      alert('Error saving profile: ' + error.message);
+    });
+};
       document.getElementById('loginPage').classList.add('hidden');
       document.getElementById('profilePage').classList.remove('hidden');
     })
